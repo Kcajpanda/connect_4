@@ -5,17 +5,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+/**
+ * Owns the runtime Connect Four board, move history, turn state, and world
+ * updates.
+ *
+ * <p>The board is stored as {@code board[row][column]} where row {@code 0} is
+ * the bottom playable slot and column {@code 0} is the left-most configured
+ * slot.</p>
+ */
 final class ConnectFourGame {
     private final ConnectFourPlugin plugin;
     private final GameConfig config;
@@ -38,11 +46,39 @@ final class ConnectFourGame {
         return config.columns();
     }
 
+    /**
+     * Drops a token using one-based columns intended for player-facing commands.
+     *
+     * @param sender recipient for validation errors
+     * @param oneBasedColumn column number from {@code 1} through the configured
+     *     column count
+     * @param actorName player name to bind or validate for the active side
+     */
     void drop(CommandSender sender, int oneBasedColumn, String actorName) {
         if (oneBasedColumn < 1 || oneBasedColumn > config.columns()) {
             sender.sendMessage(color("&cColumn must be between 1 and " + config.columns() + "."));
             return;
         }
+        playMove(sender, oneBasedColumn - 1, actorName, true, "Column " + oneBasedColumn);
+    }
+
+    /**
+     * Places a token instantly using zero-based columns for command blocks.
+     *
+     * @param sender recipient for validation errors
+     * @param zeroBasedColumn left-to-right column index from {@code 0} through
+     *     {@code columns - 1}
+     * @param actorName player name to bind or validate for the active side
+     */
+    void place(CommandSender sender, int zeroBasedColumn, String actorName) {
+        if (zeroBasedColumn < 0 || zeroBasedColumn >= config.columns()) {
+            sender.sendMessage(color("&cColumn index must be between 0 and " + (config.columns() - 1) + "."));
+            return;
+        }
+        playMove(sender, zeroBasedColumn, actorName, false, "Column index " + zeroBasedColumn);
+    }
+
+    private void playMove(CommandSender sender, int column, String actorName, boolean animate, String columnLabel) {
         if (animating) {
             sender.sendMessage(color("&cWait for the current token to finish dropping."));
             return;
@@ -53,12 +89,15 @@ final class ConnectFourGame {
         }
         if (config.syncWorldBeforeMove()) {
             scanFromWorld();
+            if (gameOver) {
+                sender.sendMessage(color("&cThe scanned board is already complete. Run /connectfour reset to start again."));
+                return;
+            }
         }
 
-        int column = oneBasedColumn - 1;
         int row = firstOpenRow(column);
         if (row == -1) {
-            sender.sendMessage(color("&cColumn " + oneBasedColumn + " is full."));
+            sender.sendMessage(color("&c" + columnLabel + " is full."));
             return;
         }
 
@@ -71,7 +110,13 @@ final class ConnectFourGame {
             return;
         }
 
-        animateDrop(column, row, disc, displayName);
+        if (animate) {
+            animateDrop(column, row, disc, displayName);
+            return;
+        }
+
+        setBlock(config.boardPosition(column, row), materialForDisc(disc));
+        finishMove(column, row, disc, displayName);
     }
 
     void resetBoard(boolean clearBlocks) {
@@ -356,6 +401,6 @@ final class ConnectFourGame {
     }
 
     private String color(String message) {
-        return message.replace('&', '§');
+        return ChatColor.translateAlternateColorCodes('&', message);
     }
 }

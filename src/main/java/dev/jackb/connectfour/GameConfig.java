@@ -9,6 +9,12 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+/**
+ * Immutable runtime view of {@code config.yml}.
+ *
+ * <p>The loader validates world availability, board size, materials, drop
+ * locations, and the configured board range before the game starts.</p>
+ */
 final class GameConfig {
     private final World world;
     private final int rows;

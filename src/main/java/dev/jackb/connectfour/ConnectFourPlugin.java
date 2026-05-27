@@ -4,6 +4,9 @@ import java.util.logging.Level;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Paper plugin entry point for the configurable Connect Four board.
+ */
 public final class ConnectFourPlugin extends JavaPlugin {
     private ConnectFourGame game;
 

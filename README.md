@@ -14,7 +14,17 @@ The plugin jar will be created under `build/libs/`.
 
 ## Command Blocks
 
-Set each command block to run the matching column command:
+For command blocks, use `place`. It takes a zero-based column index, so the
+left-most column is `0` and the right-most column is `6`.
+
+```text
+/connectfour place 0 @p
+/connectfour place 1 @p
+...
+/connectfour place 6 @p
+```
+
+Use `drop` for one-based, animated player-facing commands:
 
 ```text
 /connectfour drop 1 @p
@@ -23,7 +33,8 @@ Set each command block to run the matching column command:
 /connectfour drop 7 @p
 ```
 
-The optional `@p` lets the plugin record the nearest player as the mover. Player commands also work:
+The `@p` selector lets the plugin record the nearest player as the mover.
+Player commands also work:
 
 ```text
 /connectfour drop 4
@@ -38,3 +49,16 @@ Admin commands:
 /connectfour status
 /connectfour log 10
 ```
+
+## Documentation
+
+GitHub wiki source pages live in `docs/wiki/`.
+
+Javadocs can be built locally with:
+
+```powershell
+gradle javadoc
+```
+
+The GitHub Actions workflow in `.github/workflows/javadocs.yml` publishes the
+generated Javadocs to GitHub Pages.

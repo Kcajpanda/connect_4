@@ -4,6 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
+/**
+ * Integer block coordinate used by the board, drop locations, and fireworks.
+ */
 record Vec3i(int x, int y, int z) {
     static Vec3i from(ConfigurationSection section, String path) {
         ConfigurationSection value = section.getConfigurationSection(path);

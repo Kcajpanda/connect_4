@@ -7,7 +7,7 @@ api-version: '26.1.2'
 commands:
   connectfour:
     description: Controls the Connect Four board.
-    usage: /connectfour <drop|reset|reload|status|scan|log>
+    usage: /connectfour <drop|place|reset|reload|status|scan|log>
     aliases: [c4, connect4]
 permissions:
   connectfour.play:

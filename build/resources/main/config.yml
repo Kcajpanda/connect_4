@@ -25,8 +25,14 @@ board:
     min: {x: 0, y: 64, z: 0}
     max: {x: 6, y: 69, z: 0}
 
-# These are columns 1 through 7. Command blocks should run:
+# These are columns 1 through 7 for /connectfour drop.
+# They are indexes 0 through 6 for /connectfour place.
+#
+# Animated one-based command:
 # /connectfour drop 1 @p
+#
+# Instant zero-based command-block command:
+# /connectfour place 0 @p
 drop-locations:
   - {x: 0, y: 70, z: 0}
   - {x: 1, y: 70, z: 0}

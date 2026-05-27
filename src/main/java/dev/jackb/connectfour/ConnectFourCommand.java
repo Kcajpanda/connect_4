@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -15,8 +16,15 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+/**
+ * Handles the user-facing and command-block-facing Connect Four commands.
+ *
+ * <p>The {@code drop} subcommand uses human-friendly one-based columns. The
+ * {@code place} subcommand uses zero-based column indexes so command blocks can
+ * map directly to the configured seven drop locations.</p>
+ */
 final class ConnectFourCommand implements CommandExecutor, TabCompleter {
-    private static final List<String> SUBCOMMANDS = List.of("drop", "reset", "reload", "status", "scan", "log");
+    private static final List<String> SUBCOMMANDS = List.of("drop", "place", "reset", "reload", "status", "scan", "log");
 
     private final ConnectFourPlugin plugin;
 
@@ -34,6 +42,7 @@ final class ConnectFourCommand implements CommandExecutor, TabCompleter {
         try {
             switch (args[0].toLowerCase()) {
                 case "drop" -> drop(sender, label, args);
+                case "place" -> place(sender, label, args);
                 case "reset", "clear" -> reset(sender);
                 case "reload" -> reload(sender);
                 case "status" -> status(sender);
@@ -65,6 +74,26 @@ final class ConnectFourCommand implements CommandExecutor, TabCompleter {
 
         String actor = args.length >= 3 ? resolveActor(sender, args[2]) : resolveActor(sender, null);
         plugin.game().drop(sender, column, actor);
+    }
+
+    private void place(CommandSender sender, String label, String[] args) {
+        if (!hasPermission(sender, "connectfour.play")) {
+            return;
+        }
+        if (args.length < 3) {
+            sender.sendMessage(color("&cUsage: /" + label + " place <index 0-" + (plugin.game().columns() - 1) + "> <player|selector>"));
+            return;
+        }
+
+        int columnIndex;
+        try {
+            columnIndex = Integer.parseInt(args[1]);
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Column index must be a number.");
+        }
+
+        String actor = resolveActor(sender, args[2]);
+        plugin.game().place(sender, columnIndex, actor);
     }
 
     private void reset(CommandSender sender) {
@@ -176,6 +205,7 @@ final class ConnectFourCommand implements CommandExecutor, TabCompleter {
 
     private void sendUsage(CommandSender sender, String label) {
         sender.sendMessage(color("&e/" + label + " drop <column> [player|selector]"));
+        sender.sendMessage(color("&e/" + label + " place <index 0-" + (plugin.game().columns() - 1) + "> <player|selector>"));
         sender.sendMessage(color("&e/" + label + " reset"));
         sender.sendMessage(color("&e/" + label + " reload"));
         sender.sendMessage(color("&e/" + label + " status"));
@@ -193,7 +223,14 @@ final class ConnectFourCommand implements CommandExecutor, TabCompleter {
             }
             return filter(columns, args[1]);
         }
-        if (args.length == 3 && args[0].equalsIgnoreCase("drop")) {
+        if (args.length == 2 && args[0].equalsIgnoreCase("place")) {
+            List<String> columns = new ArrayList<>();
+            for (int i = 0; i < plugin.game().columns(); i++) {
+                columns.add(Integer.toString(i));
+            }
+            return filter(columns, args[1]);
+        }
+        if (args.length == 3 && (args[0].equalsIgnoreCase("drop") || args[0].equalsIgnoreCase("place"))) {
             List<String> names = new ArrayList<>(Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
             names.addAll(Arrays.asList("@p", "@a", "@r"));
             return filter(names, args[2]);
@@ -209,6 +246,6 @@ final class ConnectFourCommand implements CommandExecutor, TabCompleter {
     }
 
     private String color(String message) {
-        return message.replace('&', '§');
+        return ChatColor.translateAlternateColorCodes('&', message);
     }
 }

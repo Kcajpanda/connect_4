@@ -1,3 +1,6 @@
+import org.gradle.external.javadoc.JavadocMemberLevel
+import org.gradle.external.javadoc.StandardJavadocDocletOptions
+
 plugins {
     java
 }
@@ -15,6 +18,14 @@ java {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
+}
+
+tasks.withType<Javadoc>().configureEach {
+    options.encoding = "UTF-8"
+    (options as StandardJavadocDocletOptions).apply {
+        memberLevel = JavadocMemberLevel.PACKAGE
+        addStringOption("Xdoclint:none", "-quiet")
+    }
 }
 
 tasks.processResources {
