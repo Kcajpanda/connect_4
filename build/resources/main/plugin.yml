@@ -1,0 +1,21 @@
+name: ConnectFour
+version: 1.0.0
+main: dev.jackb.connectfour.ConnectFourPlugin
+description: Configurable Connect Four board for Minecraft.
+author: jackb
+api-version: '26.1.2'
+commands:
+  connectfour:
+    description: Controls the Connect Four board.
+    usage: /connectfour <drop|reset|reload|status|scan|log>
+    aliases: [c4, connect4]
+permissions:
+  connectfour.play:
+    description: Allows dropping Connect Four tokens.
+    default: true
+  connectfour.status:
+    description: Allows viewing Connect Four status.
+    default: true
+  connectfour.admin:
+    description: Allows resetting, reloading, rescanning, and reading the move log.
+    default: op

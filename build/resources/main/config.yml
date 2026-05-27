@@ -1,0 +1,47 @@
+# Configure the physical Connect Four board in the world.
+# Row 0 is the bottom row. Column 1 is the first drop location below.
+game:
+  world: world
+  rows: 6
+  columns: 7
+  player-one-block: RED_CONCRETE
+  player-two-block: YELLOW_CONCRETE
+  empty-block: AIR
+  enforce-turn-order: true
+  allow-same-player-for-both-sides: false
+  sync-world-before-move: true
+  animation-ticks-per-step: 4
+  clear-drop-locations-on-reset: true
+
+board:
+  # Bottom-left playable slot.
+  origin: {x: 0, y: 64, z: 0}
+  # How to move from one column to the next.
+  column-step: {x: 1, y: 0, z: 0}
+  # How to move from one row to the next.
+  row-step: {x: 0, y: 1, z: 0}
+  # Used to validate that the configured playable slots are inside your game area.
+  range:
+    min: {x: 0, y: 64, z: 0}
+    max: {x: 6, y: 69, z: 0}
+
+# These are columns 1 through 7. Command blocks should run:
+# /connectfour drop 1 @p
+drop-locations:
+  - {x: 0, y: 70, z: 0}
+  - {x: 1, y: 70, z: 0}
+  - {x: 2, y: 70, z: 0}
+  - {x: 3, y: 70, z: 0}
+  - {x: 4, y: 70, z: 0}
+  - {x: 5, y: 70, z: 0}
+  - {x: 6, y: 70, z: 0}
+
+fireworks:
+  - {x: 3, y: 72, z: 0}
+
+messages:
+  prefix: "&6[Connect Four]&r "
+  move: "&e%player%&7 dropped a &f%color%&7 token in column &f%column%&7."
+  win: "&a%player% wins Connect Four!"
+  draw: "&eThe Connect Four board is full. It is a draw."
+  reset: "&7The Connect Four board has been reset."
